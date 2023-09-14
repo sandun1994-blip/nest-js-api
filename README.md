@@ -88,3 +88,7 @@ model create in db
 #  npm i class-validator class-transformer
 
 nest g module prisma
+
+# npm install bcrypt
+npm install @types/bcryptjs
+npm i jsonwebtoken @types/jsonwebtoken
