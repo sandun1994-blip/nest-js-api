@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 
+const EXPIRE_TIME = 20 * 1000;
 interface SignupParams {
   email: string;
   password: string;
@@ -59,14 +60,37 @@ export class AuthService {
       throw new HttpException('Invalid credentials', 400);
     }
 
-    return this.generateJWT(user.name, user.id);
+    return {
+      user,
+      backendTokens: {
+        accessToken: await this.generateJWT(user.name, user.id),
+        refreshToken: await this.generateRefreshJWT(user.name, user.id),
+        expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+      },
+    };
   }
 
   private async generateJWT(name: string, id: number) {
     return await jwt.sign({ name, id }, process.env.JWT_SECRET, {
-      expiresIn: 3600,
+      expiresIn: '20s',
     });
+  }
+
+  private async generateRefreshJWT(name: string, id: number) {
+    return await jwt.sign({ name, id }, process.env.JWT_REFRESH_SECRET, {
+      expiresIn: '7d',
+    });
+  }
+
+  async refreshToken(user: any) {
+    console.log(user);
+
+    return {
+      accessToken: await this.generateJWT(user.name, user.id),
+      refreshToken: await this.generateRefreshJWT(user.name, user.id),
+      expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+    };
   }
 }
 
-// 5:42 
+// 5:42
