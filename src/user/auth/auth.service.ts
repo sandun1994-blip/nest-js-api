@@ -72,7 +72,7 @@ export class AuthService {
 
   private async generateJWT(name: string, id: number) {
     return await jwt.sign({ name, id }, process.env.JWT_SECRET, {
-      expiresIn: '20s',
+      expiresIn: 36000,
     });
   }
 

@@ -14,8 +14,6 @@ export class HomeController {
     @Query('propertyType') propertyType?: string,
   ) {
     console.log(city, minPrice, maxPrice, propertyType, 'ok');
-    // return this.homeService.getHomes();
-
-    return 'hello yo';
+     return this.homeService.getHomes();
   }
 }

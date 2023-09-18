@@ -20,6 +20,8 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     const token = request.headers?.authorization?.split('Bearer ')[1];
+    console.log(token);
+    
     try {
       const user = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -27,6 +29,8 @@ export class AuthGuard implements CanActivate {
 
       return true;
     } catch (error) {
+      console.log(error);
+      
       return false;
     }
   }

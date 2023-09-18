@@ -10,31 +10,251 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id Int @id @default(autoincrement())
-  name String
-  phone String
-  email String  @unique
-  password String
+  id         Int      @id @default(autoincrement())
+  name       String
+  phone      String
+  email      String   @unique
+  password   String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  user_type String
-
-
+  user_type  String
 }
 
 model Home {
-  id                    Int   @id @default(autoincrement())
-  address               String
-  number_of_bedrooms    Int
-  number_of_bathrooms   Float
-  city                  String
-  listed_date           DateTime @default(now())
-  price                 Float
-  land_size             Float
-  created_at            DateTime @default(now())
-  updated_at            DateTime @updatedAt
-
+  id                  Int      @id @default(autoincrement())
+  address             String
+  number_of_bedrooms  Int
+  number_of_bathrooms Float
+  city                String
+  listed_date         DateTime @default(now())
+  price               Float
+  land_size           Float
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
 }
 
+model CustomerAccount {
+  accNo            Int       @id(clustered: false, map: "PK_DR_ACCS") @default(autoincrement()) @map("ACCNO")
+  name             String?   @map("NAME")
+  address1         String?   @map("ADDRESS1") @db.NVarChar(30)
+  address2         String?   @map("ADDRESS2") @db.NVarChar(30)
+  address3         String?   @map("ADDRESS3") @db.NVarChar(30)
+  deleveryAddress1 String?   @map("DELADDR1") @db.NVarChar(30)
+  deleveryAddress2 String?   @map("DELADDR2") @db.NVarChar(30)
+  deleveryAddress3 String?   @map("DELADDR3") @db.NVarChar(30)
+  deleveryAddress4 String?   @map("DELADDR4") @db.NVarChar(30)
+  phone            String?   @map("PHONE") @db.NVarChar(30)
+  fax              String?   @map("FAX") @db.NVarChar(30)
+  email            String?   @map("EMAIL") @db.NVarChar(60)
+  acccountGroup    Int?      @default(0, map: "DF__DR_ACCS__ACCGROU__7A521F79") @map("ACCGROUP")
+  startDate        DateTime? @default(now(), map: "DF__DR_ACCS__STARTDA__09946309") @map("STARTDATE") @db.DateTime
+  priceNo          Int?      @default(1, map: "DF__DR_ACCS__PRICENO__0D64F3ED")
+  isActive         String?   @default("Y", map: "DF__DR_ACCS__ISACTIV__25A691D2") @map("ISACTIVE") @db.Char(1)
+  deleveryAddress5 String?   @map("DELADDR5") @db.NVarChar(30)
+  postCode         String?   @map("POST_CODE") @db.NVarChar(12)
+  address4         String?   @map("ADDRESS4") @db.NVarChar(30)
+  address5         String?   @map("ADDRESS5") @db.NVarChar(30)
+
+  @@map("DR_ACCS")
+}
+
+model StockRequirement {
+  stockCode   String  @map("STOCKCODE")
+  locNo       Int     @map("LOCNO")
+  discription String? @map("DESCRIPTION")
+  accNo       Int     @map("ACCNO")
+  stockGroup  Int?    @map("STOCKGROUP")
+  minStock    Int?    @map("MINSTOCK")
+  maxStock    Int?    @map("MAXSTOCK")
+  inStockQTY  Int?    @map("INSTOCKQTY")
+  purchOrdQTY Int?    @map("PURCHORDQTY")
+
+  salesOrdQTY            Int?            @map("SALESORDQTY")
+  viritStock             Int?            @map("VIRTSTOCK")
+  calcReOrd              Int?            @map("CALCREORD")
+  actualReOrd            Int?            @map("ACTUALREORD")
+  sales0                 Int?            @map("SALES0")
+  sales1                 Int?            @map("SALES1")
+  sales2                 Int?            @map("SALES2")
+  sales3                 Int?            @map("SALES3")
+  sales4                 Int?            @map("SALES4")
+  sales5                 Int?            @map("SALES5")
+  sales6                 Int?            @map("SALES6")
+  supplierNo             String?         @map("X_SOURCE_OF_SUPPLY")
+  commited               Int?            @map("Commited")
+  supplierlocationName   String?         @map("LNAME")
+  supplierAccountName    String?         @map("NAME")
+  supplierlocationName2  String?         @map("LNAME_2")
+  supplierName           String?         @map("SupplierName")
+  sumStockRequiementCalc Int?            @map("SUM_StockRequirement_CALC")
+  supplierCode           String?         @map("SUPPLIERCODE")
+  centralLocation        Int?            @map("centralLocation")
+  Incommingty            Int?            @map("Incommingty")
+  stockItem              StockItem       @relation(fields: [stockCode], references: [stockCode])
+  stockLocation          StockLocation   @relation(fields: [locNo], references: [locNo])
+  supplierAccount        SupplierAccount @relation(fields: [accNo], references: [accNo])
+
+  @@unique([stockCode, accNo, locNo])
+  @@map("vw_stock_reorder_portal")
+}
+
+model StockItem {
+  stockCode        String             @id(map: "PK__STOCK_ITEMS__11007AA7") @map("STOCKCODE") @db.NVarChar(23)
+  stockRequirement StockRequirement[]
+  description      String?            @map("DESCRIPTION") @db.NVarChar(100)
+  stockGroup       Int?               @default(0, map: "DF__STOCK_ITE__STOCK__11F49EE0") @map("STOCKGROUP")
+  status           String?            @default("L", map: "DF__STOCK_ITE__STATU__12E8C319") @map("STATUS") @db.Char(1)
+  sellPrice1       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__13DCE752") @map("SELLPRICE1")
+  sellPrice2       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__14D10B8B") @map("SELLPRICE2")
+  sellPrice3       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__15C52FC4") @map("SELLPRICE3")
+  sellPrice4       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__16B953FD") @map("SELLPRICE4")
+  sellPrice5       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__39987BE6") @map("SELLPRICE5")
+  sellPrice6       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__3A8CA01F") @map("SELLPRICE6")
+  sellPrice7       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__3B80C458") @map("SELLPRICE7")
+  sellPrice8       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__3C74E891") @map("SELLPRICE8")
+  sellPrice9       Float?             @default(0, map: "DF__STOCK_ITE__SELLP__3D690CCA") @map("SELLPRICE9")
+  sellPrice10      Float?             @default(0, map: "DF__STOCK_ITE__SELLP__3E5D3103") @map("SELLPRICE10")
+  latestCost       Float?             @default(0, map: "DF__STOCK_ITE__LATES__17AD7836") @map("LATESTCOST")
+  avgCost          Float?             @default(0, map: "DF__STOCK_ITE__AVECO__18A19C6F") @map("AVECOST")
+  supplierNo       Int?               @default(0, map: "DF__STOCK_ITE__SUPPL__25FB978D") @map("SUPPLIERNO")
+  notes            String?            @map("NOTES") @db.NVarChar(Max)
+  totalStock       Float              @default(0, map: "DF__STOCK_ITE__TOTAL__51700577") @map("TOTALSTOCK")
+  pitureUrl        String?            @map("X_PICTURE") @db.NVarChar(100)
+  qrCode           String?            @map("X_QRCODE") @db.VarChar(100)
+  toolItemsImage   String?            @map("X_TOOL_ITEMS_IMAGE") @db.VarChar(300)
+  billomatHdr      BillomatHdr?       @relation(fields: [stockCode], references: [billCode])
+
+  @@map("STOCK_ITEMS")
+}
+
+model StockLocation {
+  locNo                Int                @id(map: "PK__STOCK_LOC__LOCNO__04BA9F53") @map("LOCNO")
+  lCode                String?            @map("LCODE") @db.NVarChar(8)
+  lName                String?            @map("LNAME") @db.NVarChar(30)
+  isActive             String?            @default("Y", map: "DF__STOCK_LOC__ISACT__05AEC38C") @map("ISACTIVE") @db.Char(1)
+  excludeFromValuation String?            @default("N", map: "DF__STOCK_LOC__EXCLU__671F4F74") @map("EXCLUDE_FROMVALUATION") @db.Char(1)
+  excludeFromFree      String?            @default("N", map: "DF__STOCK_LOC__EXCLU__681373AD") @map("EXCLUDE_FROMFREE_STOCK") @db.Char(1)
+  excludeFromSales     String?            @default("N", map: "DF__STOCK_LOC__EXCLU__690797E6") @map("EXCLUDE_FROMSALES") @db.Char(1)
+  deladdr1             String?            @map("DELADDR1") @db.NVarChar(30)
+  deladdr2             String?            @map("DELADDR2") @db.NVarChar(30)
+  deladdr3             String?            @map("DELADDR3") @db.NVarChar(30)
+  deladdr4             String?            @map("DELADDR4") @db.NVarChar(30)
+  deladdr5             String?            @map("DELADDR5") @db.NVarChar(30)
+  deladdr6             String?            @map("DELADDR6") @db.NVarChar(30)
+  isWipLocation        String?            @default("N", map: "DF__STOCK_LOC__IS_WI__2CFF3185") @map("IS_WIPLOCATION") @db.Char(1)
+  xReOrderPointReport  String?            @map("X_REORDERPOINT_REPORT") @db.NChar(1)
+  stockRequirement     StockRequirement[]
+
+  @@map("STOCK_LOCATIONS")
+}
+
+model SupplierAccount {
+  accNo            Int                @id(map: "PK__CR_ACCS__3C54ED00") @default(autoincrement()) @map("ACCNO")
+  name             String?            @default("", map: "DF__CR_ACCS__NAME__3D491139") @map("NAME") @db.NVarChar(60)
+  address1         String?            @map("ADDRESS1") @db.NVarChar(30)
+  address2         String?            @map("ADDRESS2") @db.NVarChar(30)
+  address3         String?            @map("ADDRESS3") @db.NVarChar(30)
+  phone            String?            @map("PHONE") @db.NVarChar(30)
+  fax              String?            @map("FAX") @db.NVarChar(30)
+  email            String?            @map("EMAIL") @db.NVarChar(60)
+  acccountGroup    Int?               @default(0, map: "DF__CR_ACCS__ACCGROU__3F3159AB") @map("ACCGROUP")
+  creditStatus     Int?               @default(0, map: "DF__CR_ACCS__CREDITS__46D27B73") @map("CREDITSTATUS")
+  deleveryAddress1 String?            @map("DELADDR1") @db.NVarChar(30)
+  deleveryAddress2 String?            @map("DELADDR2") @db.NVarChar(30)
+  deleveryAddress3 String?            @map("DELADDR3") @db.NVarChar(30)
+  deleveryAddress4 String?            @map("DELADDR4") @db.NVarChar(30)
+  notes            String?            @map("NOTES") @db.NVarChar(Max)
+  currencyNo       Int?               @default(0, map: "DF_CR_ACCS_CURRENCYNO") @map("CURRENCYNO")
+  isActive         String?            @default("Y", map: "DF__CR_ACCS__ISACTIV__269AB60B") @map("ISACTIVE") @db.Char(1)
+  postCode         String?            @map("POST_CODE") @db.NVarChar(12)
+  deleveryAddress5 String?            @map("DELADDR5") @db.NVarChar(30)
+  deleveryAddress6 String?            @map("DELADDR6") @db.NVarChar(30)
+  address4         String?            @map("ADDRESS4") @db.NVarChar(30)
+  acccountGroup2   Int?               @default(0, map: "DF__CR_ACCS__ACCGROU__4D9F7493") @map("ACCGROUP2")
+  address5         String?            @map("ADDRESS5") @db.NVarChar(30)
+  deliveryNotes    String?            @map("X_DELIVERY_NOTES") @db.NVarChar(30)
+  deliveryNotesTwo String?            @map("X_DEL_NOTES") @db.NVarChar(300)
+  creditStatuses   CreditStatuses?    @relation(fields: [creditStatus], references: [statusNo])
+  stockRequirement StockRequirement[]
+
+  @@map("CR_ACCS")
+}
+
+model CreditStatuses {
+  statusNo        Int               @id(map: "PK__CREDIT_STATUSES__38845C1C") @map("STATUSNO")
+  statusDesc      String?           @map("STATUSDESC") @db.NVarChar(30)
+  creditFactor    Int               @default(0, map: "DF__CREDIT_ST__CREDI__6BAFC5BE") @map("CREDIT_FACTOR")
+  activeDr        String?           @default("N", map: "DF__CREDIT_ST__ACTIV__6CA3E9F7") @map("ACTIVE_DR") @db.Char(1)
+  activeCr        String?           @default("N", map: "DF__CREDIT_ST__ACTIV__6D980E30") @map("ACTIVE_CR") @db.Char(1)
+  balWarningSql   String?           @map("BAL_WARNING_SQL") @db.NVarChar(60)
+  warningText     String?           @map("WARNING_TEXT") @db.NVarChar(100)
+  supplierAccount SupplierAccount[]
+
+  @@map("CREDIT_STATUSES")
+}
+
+model BillomatHdr {
+  billCode    String     @id(map: "PK__BILLOMAT___BILLC__0559BDD1") @map("BILLCODE") @db.NVarChar(23)
+  discription String?    @map("DESCRIPTION") @db.NVarChar(100)
+  sellPrice1  Float?     @default(0, map: "DF__BILLOMAT___SELLP__064DE20A") @map("SELLPRICE1")
+  sellPrice2  Float?     @default(0, map: "DF__BILLOMAT___SELLP__07420643") @map("SELLPRICE2")
+  sellPrice3  Float?     @default(0, map: "DF__BILLOMAT___SELLP__08362A7C") @map("SELLPRICE3")
+  sellPrice4  Float?     @default(0, map: "DF__BILLOMAT___SELLP__092A4EB5") @map("SELLPRICE4")
+  costPrice   Float?     @default(0, map: "DF__BILLOMAT___COSTP__0A1E72EE") @map("COSTPRICE")
+  pricingMode Int?       @default(0, map: "DF__BILLOMAT___PRICI__0B129727") @map("PRICING_MODE")
+  outCode     String?    @map("OUTPUT_CODE") @db.NVarChar(23)
+  batchQty    Float?     @default(1, map: "DF__BILLOMAT___BATCH__0C06BB60") @map("BATCH_QTY")
+  hideLines   String?    @default("N", map: "DF__BILLOMAT___HIDE___18027DF1") @map("HIDE_LINES") @db.Char(1)
+  wastage     Float?     @default(0, map: "DF__BILLOMAT___WASTA__4E298478") @map("WASTAGE")
+  notes       String?    @map("NOTES") @db.NVarChar(2048)
+  sellPrice5  Float?     @default(0, map: "DF__BILLOMAT___SELLP__0504B816") @map("SELLPRICE5")
+  sellPrice6  Float?     @default(0, map: "DF__BILLOMAT___SELLP__05F8DC4F") @map("SELLPRICE6")
+  sellPrice7  Float?     @default(0, map: "DF__BILLOMAT___SELLP__06ED0088") @map("SELLPRICE7")
+  sellPrice8  Float?     @default(0, map: "DF__BILLOMAT___SELLP__07E124C1") @map("SELLPRICE8")
+  sellPrice9  Float?     @default(0, map: "DF__BILLOMAT___SELLP__08D548FA") @map("SELLPRICE9")
+  sellPrice10 Float?     @default(0, map: "DF__BILLOMAT___SELLP__09C96D33") @map("SELLPRICE10")
+  isActive    String?    @default("Y", map: "DF__BILLOMAT___ISACT__72C6D7A1") @map("ISACTIVE") @db.Char(1)
+  kitType     Int        @default(0, map: "DF__BILLOMAT___KIT_T__114B5EC1") @map("KIT_TYPE")
+  bomType     String     @default("K", map: "DF__BILLOMAT___BOMTY__123F82FA") @map("BOMTYPE") @db.Char(1)
+  autoBuild   String     @default("N", map: "DF__BILLOMAT___AUTOB__2F70BE85") @map("AUTOBUILD") @db.Char(1)
+  stockItem   StockItem?
+  workOrder WorkOrder[]
+  billomatLines BillomatLines []
+
+  @@map("BILLOMAT_HDR")
+}
+
+model BillomatLines {
+  seqNo       Int     @id(map: "PK__BILLOMAT___SEQNO__2B7F66B9") @default(autoincrement())@map("SEQNO")
+  billCode    String? @db.NVarChar(23)@map("BILLCODE")
+  stockCode   String? @db.NVarChar(23)@map("STOCKCODE")
+  quantity    Float?  @default(1, map: "DF__BILLOMAT___QUANT__2C738AF2")@map("QUANTITY")
+  description String? @db.NVarChar(100)@map("DESCRIPTION")
+  variantline String? @default("N", map: "DF__BILLOMAT___VARIA__73BAFBDA") @db.Char(1)@map("VARIANTLINE")
+  billomatHdr BillomatHdr? @relation(fields: [billCode],references: [billCode])
+
+@@map("BILLOMAT_LINES")
+}
+
+model WorkOrder {
+  seqNo                Int       @id(map: "PK__WORKSORD___SEQNO__40CF895A") @default(autoincrement()) @map("SEQNO")
+  billCode             String?   @map("BILLCODE") @db.NVarChar(23)
+  stockItem            String?   @map("PRODCODE") @db.NVarChar(23)
+  sentMail             String?   @map("BATCHCODE") @db.NVarChar(15)
+  transactionDate      DateTime? @default(now(), map: "DF__WORKSORD___TRANS__41C3AD93") @map("TRANSDATE") @db.DateTime
+  productionDate       DateTime? @map("PRODDATE") @db.DateTime
+  dueDate              DateTime? @map("DUEDATE") @db.DateTime
+  orderStatus          Int?      @default(0, map: "DF__WORKSORD___ORDST__42B7D1CC") @map("ORDSTATUS")
+  workOrderNo          Int?      @default(0, map: "DF__WORKSORD___SALES__43ABF605") @map("SALESORDNO")
+  notes                String?   @map("NOTES") @db.NVarChar(2048)
+  productionQty        Float?    @default(1, map: "DF__WORKSORD___PRODQ__446B1014") @map("PRODQTY")
+  actualQty            Float?    @default(0, map: "DF__WORKSORD___ACTUA__455F344D") @map("ACTUALQTY")
+  productionLocationNo Int?      @default(1, map: "DF__WORKSORD___PRODL__46535886") @map("PRODLOCNO")
+  reference            String?   @map("REFERENCE") @db.NVarChar(30)
+  staffNo              Int?      @default(0, map: "DF__WORKSORD___STAFF__47477CBF") @map("STAFFNO")
+  componentLocationNo  Int?      @default(0, map: "DF__WORKSORD___COMPO__06CDD04E") @map("COMPONENTLOCNO")
+  expiryDate           DateTime? @map("EXPIRY_DATE") @db.DateTime
+  billomatHdr BillomatHdr? @relation(fields: [billCode],references: [billCode])
+  @@map("WORKSORD_HDR")
+}
