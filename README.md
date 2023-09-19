@@ -92,3 +92,19 @@ nest g module prisma
 # npm install bcrypt
 npm install @types/bcryptjs
 npm i jsonwebtoken @types/jsonwebtoken
+
+
+
+model Home {
+  id                    Int   @id @default(autoincrement())
+  address               String
+  number_of_bedrooms    Int
+  number_of_bathrooms   Float
+  city                  String
+  listed_date           DateTime @default(now())
+  price                 Float
+  land_size             Float
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+}

@@ -1,11 +1,11 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { StockrequirementService } from './stockrequirement.service';
+import { SupplierstockitemsService } from './supplierstockitems.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 
-@Controller('stockrequirement')
-export class StockrequirementController {
+@Controller('supplierstockitems')
+export class SupplierstockitemsController {
   constructor(
-    private readonly stockrequirementService: StockrequirementService,
+    private readonly supplierstockitemsService: SupplierstockitemsService,
   ) {}
   @UseGuards(AuthGuard)
   @Get()
@@ -15,7 +15,7 @@ export class StockrequirementController {
     @Query('maxPrice') maxPrice?: string,
     @Query('propertyType') propertyType?: string,
   ) {
-   // console.log(city, minPrice, maxPrice, propertyType, 'ok');
-    return this.stockrequirementService.getStockrequirement();
+    // console.log(city, minPrice, maxPrice, propertyType, 'ok');
+    return this.supplierstockitemsService.supplierstockitems();
   }
 }

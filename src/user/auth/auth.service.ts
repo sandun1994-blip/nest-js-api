@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 
-const EXPIRE_TIME = 20 * 1000;
+const EXPIRE_TIME = 60 * 60000 * 24;
 interface SignupParams {
   email: string;
   password: string;
@@ -72,7 +72,7 @@ export class AuthService {
 
   private async generateJWT(name: string, id: number) {
     return await jwt.sign({ name, id }, process.env.JWT_SECRET, {
-      expiresIn: 36000,
+      expiresIn: '1d',
     });
   }
 
