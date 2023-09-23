@@ -98,6 +98,42 @@ model StockRequirement {
   @@map("vw_stock_reorder_portal")
 }
 
+model StockRequirementTwo {
+  stockCode              String        @map("STOCKCODE")
+  locNo                  Int           @map("LOCNO")
+  discription            String?       @map("DESCRIPTION")
+  accNo                  Int           @map("ACCNO")
+  stockGroup             Int?          @map("STOCKGROUP")
+  minStock               Int?          @map("MINSTOCK")
+  maxStock               Int?          @map("MAXSTOCK")
+  inStockQTY             Int?          @map("INSTOCKQTY")
+  purchOrdQTY            Int?          @map("PURCHORDQTY")
+  salesOrdQTY            Int?          @map("SALESORDQTY")
+  viritStock             Int?          @map("VIRTSTOCK")
+  calcReOrd              Int?          @map("CALCREORD")
+  actualReOrd            Int?          @map("ACTUALREORD")
+  sales0                 Int?          @map("SALES0")
+  sales1                 Int?          @map("SALES1")
+  sales2                 Int?          @map("SALES2")
+  sales3                 Int?          @map("SALES3")
+  sales4                 Int?          @map("SALES4")
+  sales5                 Int?          @map("SALES5")
+  sales6                 Int?          @map("SALES6")
+  supplierNo             String?       @map("X_SOURCE_OF_SUPPLY")
+  supplierlocationName   String?       @map("LNAME")
+  supplierAccountName    String?       @map("NAME")
+  supplierlocationName2  String?       @map("LNAME_2")
+  supplierName           String?       @map("SupplierName")
+  sumStockRequiementCalc Int?          @map("SUM_StockRequirement_CALC")
+  supplierCode           String?       @map("SUPPLIERCODE")
+  centralLocation        Int?          @map("centralLocation")
+  Incommingty            Int?          @map("Incommingty")
+  stockLocation          StockLocation @relation(fields: [locNo], references: [locNo])
+
+  @@unique([stockCode, accNo, locNo])
+  @@map("vw_stock_reorder_portal_two")
+}
+
 model StockItem {
   stockCode          String               @id(map: "PK__STOCK_ITEMS__11007AA7") @map("STOCKCODE") @db.NVarChar(23)
   stockRequirement   StockRequirement[]
@@ -129,22 +165,23 @@ model StockItem {
 }
 
 model StockLocation {
-  locNo                Int                @id(map: "PK__STOCK_LOC__LOCNO__04BA9F53") @map("LOCNO")
-  lCode                String?            @map("LCODE") @db.NVarChar(8)
-  lName                String?            @map("LNAME") @db.NVarChar(30)
-  isActive             String?            @default("Y", map: "DF__STOCK_LOC__ISACT__05AEC38C") @map("ISACTIVE") @db.Char(1)
-  excludeFromValuation String?            @default("N", map: "DF__STOCK_LOC__EXCLU__671F4F74") @map("EXCLUDE_FROMVALUATION") @db.Char(1)
-  excludeFromFree      String?            @default("N", map: "DF__STOCK_LOC__EXCLU__681373AD") @map("EXCLUDE_FROMFREE_STOCK") @db.Char(1)
-  excludeFromSales     String?            @default("N", map: "DF__STOCK_LOC__EXCLU__690797E6") @map("EXCLUDE_FROMSALES") @db.Char(1)
-  deladdr1             String?            @map("DELADDR1") @db.NVarChar(30)
-  deladdr2             String?            @map("DELADDR2") @db.NVarChar(30)
-  deladdr3             String?            @map("DELADDR3") @db.NVarChar(30)
-  deladdr4             String?            @map("DELADDR4") @db.NVarChar(30)
-  deladdr5             String?            @map("DELADDR5") @db.NVarChar(30)
-  deladdr6             String?            @map("DELADDR6") @db.NVarChar(30)
-  isWipLocation        String?            @default("N", map: "DF__STOCK_LOC__IS_WI__2CFF3185") @map("IS_WIPLOCATION") @db.Char(1)
-  xReOrderPointReport  String?            @map("X_REORDERPOINT_REPORT") @db.NChar(1)
+  locNo                Int                   @id(map: "PK__STOCK_LOC__LOCNO__04BA9F53") @map("LOCNO")
+  lCode                String?               @map("LCODE") @db.NVarChar(8)
+  lName                String?               @map("LNAME") @db.NVarChar(30)
+  isActive             String?               @default("Y", map: "DF__STOCK_LOC__ISACT__05AEC38C") @map("ISACTIVE") @db.Char(1)
+  excludeFromValuation String?               @default("N", map: "DF__STOCK_LOC__EXCLU__671F4F74") @map("EXCLUDE_FROMVALUATION") @db.Char(1)
+  excludeFromFree      String?               @default("N", map: "DF__STOCK_LOC__EXCLU__681373AD") @map("EXCLUDE_FROMFREE_STOCK") @db.Char(1)
+  excludeFromSales     String?               @default("N", map: "DF__STOCK_LOC__EXCLU__690797E6") @map("EXCLUDE_FROMSALES") @db.Char(1)
+  deladdr1             String?               @map("DELADDR1") @db.NVarChar(30)
+  deladdr2             String?               @map("DELADDR2") @db.NVarChar(30)
+  deladdr3             String?               @map("DELADDR3") @db.NVarChar(30)
+  deladdr4             String?               @map("DELADDR4") @db.NVarChar(30)
+  deladdr5             String?               @map("DELADDR5") @db.NVarChar(30)
+  deladdr6             String?               @map("DELADDR6") @db.NVarChar(30)
+  isWipLocation        String?               @default("N", map: "DF__STOCK_LOC__IS_WI__2CFF3185") @map("IS_WIPLOCATION") @db.Char(1)
+  xReOrderPointReport  String?               @map("X_REORDERPOINT_REPORT") @db.NChar(1)
   stockRequirement     StockRequirement[]
+  StockRequirementTwo  StockRequirementTwo[]
 
   @@map("STOCK_LOCATIONS")
 }

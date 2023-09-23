@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { StockrequirementService } from './stockrequirement.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 
@@ -9,13 +9,20 @@ export class StockrequirementController {
   ) {}
   @UseGuards(AuthGuard)
   @Get()
-  getHomes(
+  getSTK(
     @Query('city') city?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
     @Query('propertyType') propertyType?: string,
   ) {
-   // console.log(city, minPrice, maxPrice, propertyType, 'ok');
+    // console.log(city, minPrice, maxPrice, propertyType, 'ok');
     return this.stockrequirementService.getStockrequirement();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('stktwo/:stockcode')
+  getSTKTwo(@Param('stockcode') stockcode: string) {
+    
+    return this.stockrequirementService.getSTKByStockcode(stockcode);
   }
 }

@@ -6,6 +6,7 @@ export class StockrequirementService {
   constructor(private readonly prismaService: PrismaService) {}
   async getStockrequirement(): Promise<any[]> {
     const stk = await this.prismaService.stockRequirement.findMany({
+      take: 100,
       include: {
         stockItem: {
           include: {
@@ -25,6 +26,23 @@ export class StockrequirementService {
             creditStatuses: true,
           },
         },
+      },
+    });
+    return stk.map((item) => item);
+  }
+
+  async getSTKByStockcode(stockcode): Promise<any[]> {
+    const stk = await this.prismaService.stockRequirementTwo.findMany({
+      where: {
+        stockCode: stockcode,
+        stockLocation: {
+          lName: {
+            endsWith: 'WAREHOUSE',
+          },
+        },
+      },
+      include: {
+        stockLocation: true,
       },
     });
     return stk.map((item) => item);
