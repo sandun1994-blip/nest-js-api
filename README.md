@@ -93,7 +93,7 @@ nest g module prisma
 npm install @types/bcryptjs
 npm i jsonwebtoken @types/jsonwebtoken
 
-
+intitle:index.of?avatar
 
 model Home {
   id                    Int   @id @default(autoincrement())

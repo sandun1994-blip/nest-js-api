@@ -7,9 +7,12 @@ import { HomeModule } from './home/home.module';
 import { ConfigModule } from '@nestjs/config';
 import { StockrequirementModule } from './stockrequirement/stockrequirement.module';
 import { SupplierstockitemsModule } from './supplierstockitems/supplierstockitems.module';
+import { SupplieraccountModule } from './supplieraccount/supplieraccount.module';
+import { ReodertoolModule } from './reodertool/reodertool.module';
+import { PurchaseorderModule } from './purchaseorder/purchaseorder.module';
 
 @Module({
-  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule],
+  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule],
   controllers: [AppController],
   providers: [AppService],
 })

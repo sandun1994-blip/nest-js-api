@@ -24,4 +24,25 @@ export class SupplierstockitemsService {
     });
     return stk.map((item) => item);
   }
+  async getAccountByCodeAndNo(body: {
+    accNo: number[];
+    code: string[];
+  }): Promise<any[]> {
+    console.log(body);
+
+    const stk = await this.prismaService.supplierStockItems.findMany({
+      where: {
+        OR: [{ accNo: { in: body.accNo } }, { stockCode: { in: body.code } }],
+      },
+      include: {
+        stockItem: true,
+        supplierAccount: {
+          include: {
+            creditStatuses: true,
+          },
+        },
+      },
+    });
+    return stk.map((item) => item);
+  }
 }

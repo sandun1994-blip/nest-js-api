@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { SupplierstockitemsService } from './supplierstockitems.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 
@@ -17,5 +17,11 @@ export class SupplierstockitemsController {
   ) {
     // console.log(city, minPrice, maxPrice, propertyType, 'ok');
     return this.supplierstockitemsService.supplierstockitems();
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('accnoandcode')
+  signin(@Body() body: { accNo: number[]; code: string[] }) {
+    return this.supplierstockitemsService.getAccountByCodeAndNo(body);
   }
 }

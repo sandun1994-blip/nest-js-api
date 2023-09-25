@@ -6,7 +6,7 @@ export class StockrequirementService {
   constructor(private readonly prismaService: PrismaService) {}
   async getStockrequirement(): Promise<any[]> {
     const stk = await this.prismaService.stockRequirement.findMany({
-      take: 100,
+      // take: 100,
       include: {
         stockItem: {
           include: {

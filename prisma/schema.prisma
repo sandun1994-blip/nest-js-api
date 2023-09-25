@@ -127,7 +127,7 @@ model StockRequirementTwo {
   sumStockRequiementCalc Int?          @map("SUM_StockRequirement_CALC")
   supplierCode           String?       @map("SUPPLIERCODE")
   centralLocation        Int?          @map("centralLocation")
-  Incommingty            Int?          @map("Incommingty")
+  incommingty            Int?          @map("Incommingty")
   stockLocation          StockLocation @relation(fields: [locNo], references: [locNo])
 
   @@unique([stockCode, accNo, locNo])
