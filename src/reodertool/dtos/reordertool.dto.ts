@@ -1,0 +1,40 @@
+import { BillomatHdr, StockItem, SupplierAccount } from '@prisma/client';
+
+export type SendataDto = {
+  Incomingty: number;
+  billomatHdr: null | BillomatHdr; // Depending on the actual data type
+  branchName: string;
+  calcReOrd: string;
+  description: string;
+  exclamationMark: boolean;
+  fromLoc: number;
+  id: number;
+  inStockQTY: number;
+  isExpand?: boolean;
+  locationAddress1?: string;
+  locationAddress2?: string;
+  locationAddress3?: string;
+  locationAddress4?: string;
+  locationName?: string;
+  locationNumber: number;
+  maxStock?: number;
+  minStock?: number;
+  name: { name: string; accNo: number };
+  nameArray: any;
+  purchOrdQTY: number;
+  sales0?: number;
+  sales1?: number;
+  sales2?: number;
+  sales3?: number;
+  sales4?: number;
+  sales5?: number;
+  sales6: number;
+  salesOrdQTY?: number;
+  select?: boolean;
+  stockCode: string;
+  stockItem: StockItem;
+  supplierAccount: SupplierAccount;
+  supplierCode?: string;
+  supplierNumber: number;
+  workOrder?: boolean;
+};

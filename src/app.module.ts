@@ -10,9 +10,10 @@ import { SupplierstockitemsModule } from './supplierstockitems/supplierstockitem
 import { SupplieraccountModule } from './supplieraccount/supplieraccount.module';
 import { ReodertoolModule } from './reodertool/reodertool.module';
 import { PurchaseorderModule } from './purchaseorder/purchaseorder.module';
+import { PurchaseorderlineModule } from './purchaseorderline/purchaseorderline.module';
 
 @Module({
-  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule],
+  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule, PurchaseorderlineModule],
   controllers: [AppController],
   providers: [AppService],
 })
