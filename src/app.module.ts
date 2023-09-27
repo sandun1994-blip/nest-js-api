@@ -11,9 +11,11 @@ import { SupplieraccountModule } from './supplieraccount/supplieraccount.module'
 import { ReodertoolModule } from './reodertool/reodertool.module';
 import { PurchaseorderModule } from './purchaseorder/purchaseorder.module';
 import { PurchaseorderlineModule } from './purchaseorderline/purchaseorderline.module';
+import { PdfgenerateModule } from './pdfgenerate/pdfgenerate.module';
+import { MailsenderModule } from './mailsender/mailsender.module';
 
 @Module({
-  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule, PurchaseorderlineModule],
+  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule, PurchaseorderlineModule, PdfgenerateModule, MailsenderModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -17,6 +17,7 @@ export class SupplieraccountService {
         address3: true,
         address4: true,
         address5: true,
+        creditStatuses: true,
       },
     });
     return sup;

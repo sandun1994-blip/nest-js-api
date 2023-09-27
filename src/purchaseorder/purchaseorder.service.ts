@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -22,5 +23,19 @@ export class PurchaseorderService {
         branch: true,
       },
     });
+  }
+
+  async updatePOTotalsByStoredProcedure(id: number) {
+    await this.prismaService.$transaction(
+      async (tx) => {
+        // Code running in a transaction...
+        await tx.$queryRaw`EXEC UPDATE_PO_TOTAL @HDR_SEQNO =${id}`;
+      },
+      {
+        maxWait: 5000, // default: 2000
+        timeout: 10000, // default: 5000
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+      },
+    );
   }
 }

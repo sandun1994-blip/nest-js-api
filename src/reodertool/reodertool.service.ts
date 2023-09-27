@@ -4,8 +4,10 @@ import { getDate } from './lib/lib';
 import { PurchaseorderService } from 'src/purchaseorder/purchaseorder.service';
 import { SendataDto } from './dtos/reordertool.dto';
 import { PurchaseorderlineService } from 'src/purchaseorderline/purchaseorderline.service';
+import { PdfgenerateService } from 'src/pdfgenerate/pdfgenerate.service';
+import { StockrequirementService } from 'src/stockrequirement/stockrequirement.service';
 
-type BodyData = { data: SendataDto[]; name?: string };
+type BodyData = { data: SendataDto[]; user?: string };
 
 @Injectable()
 export class ReodertoolService {
@@ -13,6 +15,8 @@ export class ReodertoolService {
     private readonly prismaService: PrismaService,
     private readonly purchaseOrder: PurchaseorderService,
     private readonly purchaseOrderLine: PurchaseorderlineService,
+    private readonly pdfgenerateService: PdfgenerateService,
+    private readonly stockrequirementService: StockrequirementService,
   ) {}
 
   async sendOrder(body: BodyData): Promise<any> {
@@ -38,28 +42,23 @@ export class ReodertoolService {
       orderData.push({ supNumber, poLines });
     }
 
-    const sendData = async (time: number, supNumber: number, poLines: any[]) =>
-      new Promise((resolve, reject) => {
-        setTimeout(() => {
-          const response = this.sendMailAndData(
-            time,
-            supNumber,
-            poLines,
-            body.name,
-          );
-          response
-            .then((res) => {
-              resolve(res);
-            })
-            .catch((err) => reject(err));
-        }, 5000 * time);
-      });
+    const sendData = async (
+      time: number,
+      supNumber: number,
+      poLines: any[],
+      name: string,
+    ) => {
+      await new Promise((resolve) => setTimeout(resolve, 5000 * time));
+
+      return await this.sendMailAndData(time, supNumber, poLines, name);
+    };
 
     const promises = orderData.map((data, time: number) =>
-      sendData(time, data.supNumber, data.poLines),
+      sendData(time, data.supNumber, data.poLines, body?.user),
     );
+    const result = await Promise.allSettled(promises);
 
-    return await Promise.allSettled(promises);
+    return result;
   }
 
   async sendMailAndData(
@@ -89,10 +88,10 @@ export class ReodertoolService {
         branch: { branchNo: poLines[0].locationNumber },
       };
 
+
       const poOrder =
         await this.purchaseOrder.createByStoredProcedure(purchaseOrder);
 
-      let poOrderLine;
       const poOrderLines = [];
       for (let index = 0; index < poLines.length; index++) {
         const element = poLines[index];
@@ -117,10 +116,12 @@ export class ReodertoolService {
           priceOverridden: 0,
           linkedStockCode: element.stockItem.stockCode,
         };
-        poOrderLine =
+
+        const poOrderLine =
           await this.purchaseOrderLine.createByStoredProcedure(
             purchaseOrderLine,
           );
+
         const poReturnData = [poOrderLine].map((d) => {
           return {
             supplierAddress1: d.purchaseOrder.supplierAccount.address1,
@@ -136,8 +137,8 @@ export class ReodertoolService {
             email: d.purchaseOrder.supplierAccount.email,
             fax: d.purchaseOrder.supplierAccount.fax,
             phone: d.purchaseOrder.supplierAccount.phone,
-            orderDate: d.purchaseOrder.orderDate,
-            dispatchDate: d.purchaseOrder.dueDate,
+            orderDate: getDate(d.purchaseOrder.orderDate),
+            dispatchDate: getDate(d.purchaseOrder.dueDate),
             supplierCode: element.supplierCode,
             ourCode: d.stockItem.stockCode,
             unit: 'EACH',
@@ -156,7 +157,7 @@ export class ReodertoolService {
               ? d.narratives.narrative.substring(0, 350)
               : d.stockItem.description.substring(0, 350),
             loggedInUser: userName,
-            statusDesc: element.supplierAccount.creditStatus.statusDesc,
+            statusDesc: element.supplierAccount.creditStatuses.statusDesc,
             currencyNo:
               d.purchaseOrder.supplierAccount.currencyNo === 0 ? 'AU$' : 'US$',
           };
@@ -166,17 +167,18 @@ export class ReodertoolService {
 
       // console.log(poOrderLines);
 
-      // if (poOrderLines.length > 0) {
-      //   await services.mailSender.sendUserConfirmation(poOrderLines);
-      //   await services.purch.updatePOTotalsByStoredProcedure(poOrder.seqNo);
-      //   await services.stockRequirement.refreshStocks(supNumber);
-      // }
+      if (poOrderLines.length > 0) {
+        await this.pdfgenerateService.createPdfSendOrder(poOrderLines); 
+        await this.purchaseOrder.updatePOTotalsByStoredProcedure(poOrder.seqNo);
 
-      return { res: 'sucess' };
+        await this.stockrequirementService.refreshStocks(supNumber);
+      }
+
+      return { poNumber: poOrder.seqNo };
     } catch (error) {
       console.log(error);
 
-      throw new HttpException('Invalid credentials', 400);
+      throw new HttpException(error, 400);
     }
   }
 }
