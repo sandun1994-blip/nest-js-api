@@ -8,7 +8,7 @@ export class StockrequirementService {
   async getStockrequirement(): Promise<any[]> {
     try {
       const stk = await this.prismaService.stockRequirement.findMany({
-         take: 10,
+        take: 28,
         include: {
           stockItem: {
             include: {

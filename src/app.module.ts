@@ -13,9 +13,11 @@ import { PurchaseorderModule } from './purchaseorder/purchaseorder.module';
 import { PurchaseorderlineModule } from './purchaseorderline/purchaseorderline.module';
 import { PdfgenerateModule } from './pdfgenerate/pdfgenerate.module';
 import { MailsenderModule } from './mailsender/mailsender.module';
+import { BillomatlinesModule } from './billomatlines/billomatlines.module';
+import { BillomathdrModule } from './billomathdr/billomathdr.module';
 
 @Module({
-  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule, PurchaseorderlineModule, PdfgenerateModule, MailsenderModule],
+  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule, PurchaseorderlineModule, PdfgenerateModule, MailsenderModule, BillomatlinesModule, BillomathdrModule],
   controllers: [AppController],
   providers: [AppService],
 })
