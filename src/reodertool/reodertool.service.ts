@@ -6,6 +6,7 @@ import { SendataDto } from './dtos/reordertool.dto';
 import { PurchaseorderlineService } from 'src/purchaseorderline/purchaseorderline.service';
 import { PdfgenerateService } from 'src/pdfgenerate/pdfgenerate.service';
 import { StockrequirementService } from 'src/stockrequirement/stockrequirement.service';
+import { Prisma } from '@prisma/client';
 
 type BodyData = { data: SendataDto[]; user?: string };
 
@@ -88,7 +89,6 @@ export class ReodertoolService {
         branch: { branchNo: poLines[0].locationNumber },
       };
 
-
       const poOrder =
         await this.purchaseOrder.createByStoredProcedure(purchaseOrder);
 
@@ -168,7 +168,7 @@ export class ReodertoolService {
       // console.log(poOrderLines);
 
       if (poOrderLines.length > 0) {
-        await this.pdfgenerateService.createPdfSendOrder(poOrderLines); 
+        await this.pdfgenerateService.createPdfSendOrder(poOrderLines);
         await this.purchaseOrder.updatePOTotalsByStoredProcedure(poOrder.seqNo);
 
         await this.stockrequirementService.refreshStocks(supNumber);
@@ -179,6 +179,155 @@ export class ReodertoolService {
       console.log(error);
 
       throw new HttpException(error, 400);
+    }
+  }
+
+  // send transfer
+
+  async sendTransfer(body: BodyData): Promise<any> {
+    const supplierMap = new Map();
+    let fromLoc = 0;
+    let supplierLocFromToNumber = '';
+
+    body.data.length > 0 &&
+      body.data.forEach((d: any) => {
+        if (
+          d.name.name.toLowerCase().trim() ===
+          process.env.LOCATION_GYMPIE.toLowerCase().trim()
+        ) {
+          fromLoc = 1;
+        } else if (
+          d.name.name.toLowerCase().trim() ===
+          process.env.LOCATION_MALAGA.toLowerCase().trim()
+        ) {
+          fromLoc = 5;
+        } else {
+          fromLoc = d.fromLoc;
+        }
+
+        supplierLocFromToNumber =
+          fromLoc.toString() + d.locationNumber.toString();
+
+        if (supplierMap.has(supplierLocFromToNumber)) {
+          supplierMap.set(supplierLocFromToNumber, [
+            ...supplierMap.get(supplierLocFromToNumber),
+            d,
+          ]);
+        } else {
+          supplierMap.set(supplierLocFromToNumber, [d]);
+        }
+      });
+
+    const orderData = [];
+
+    for (const [fromTo, srLines] of supplierMap) {
+      orderData.push({ fromTo, srLines });
+    }
+
+    const sendTransfer = async (
+      time: number,
+      fromTo: number | string,
+      srLines: any[],
+    ) => {
+      await new Promise((resolve) => setTimeout(resolve, 4000 * time));
+
+      return await this.sendTransferData(time, fromTo, srLines);
+    };
+
+    const promises = orderData.map((data, time: number) =>
+      sendTransfer(time, data.fromTo, data.srLines),
+    );
+    const result = await Promise.allSettled(promises);
+
+    return result;
+  }
+
+  /////////////////////////
+  async sendTransferData(
+    time: number,
+    fromTo: number | string,
+    srLines: any[],
+  ): Promise<any> {
+    const element: any = srLines[0];
+    const stockRequest = {
+      fromLoc: element.fromLoc,
+      toLoc: element.locationNumber,
+      requestDate: new Date(),
+      requireDate: new Date(),
+      staffNo: 2,
+      status: 0,
+      transType: 1,
+      custOrderNo: null,
+      narrativeSeqNo: 0,
+      origSeqNo: 0,
+    };
+    //  console.log(stockRequest);
+    try {
+      const srResponse = await this.prismaService.stockRequests.create({
+        data: stockRequest,
+      });
+
+      const sendData = (srp: any, line: any, time: number) => {
+        setTimeout(async () => {
+          const response = await this.prismaService.$transaction(
+            async (tx) => {
+              // Code running in a transaction...
+              return await tx.narratives.create({
+                data: { narrative: line?.stockItem?.notes },
+              });
+            },
+            {
+              maxWait: 5000, // default: 2000
+              timeout: 10000, // default: 5000
+              isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+            },
+          );
+
+          const stockRequestLine = {
+            hdrSeqNo: srp.seqNo,
+            stockCode: line.stockCode,
+            description: line.description,
+            packSize: 1,
+            reqQuant: parseInt(line.calcReOrd),
+            supQuant: 0,
+            comment: null,
+            batchCode: null,
+            lineType: 0,
+            linkedStockCode: line.stockCode,
+            linkedQty: 1,
+            bomType: 'N',
+            showLine: 'Y',
+            likedStatus: 'S',
+            bomPricing: 'N',
+            narrrativeSeqNo: response.seqNo,
+            lostQuant: 0,
+            sentQuant: 0,
+            sendNow: 0,
+            supNow: 0,
+            soLineId: -1,
+          };
+          await this.prismaService.$transaction(
+            async (tx) => {
+              // Code running in a transaction...
+              return await tx.stockRequestlines.create({
+                data: stockRequestLine,
+              });
+            },
+            {
+              maxWait: 5000, // default: 2000
+              timeout: 10000, // default: 5000
+              isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+            },
+          );
+        }, 1000 * time);
+      };
+
+      for (let index = 0; index < srLines.length; index++) {
+        sendData(srResponse, srLines[index], index);
+      }
+      return srResponse;
+    } catch (error) {
+      console.log(error);
     }
   }
 }

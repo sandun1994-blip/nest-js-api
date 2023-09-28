@@ -581,3 +581,46 @@ model StockGroup {
 
   @@map("STOCK_GROUPS")
 }
+
+model StockRequests {
+  seqNo          Int       @id(map: "PK__STOCK_REQUESTS__61B15A38") @default(autoincrement()) @map("SEQNO")
+  fromLoc        Int?      @default(0, map: "DF__STOCK_REQ__FROM___62A57E71") @map("FROM_LOC")
+  toLoc          Int?      @default(0, map: "DF__STOCK_REQ__TO_LO__6399A2AA") @map("TO_LOC")
+  requestDate    DateTime? @default(now(), map: "DF__STOCK_REQ__REQUE__648DC6E3") @map("REQUEST_DATE") @db.DateTime
+  requireDate    DateTime? @default(now(), map: "DF__STOCK_REQ__REQUI__6581EB1C") @map("REQUIRE_DATE") @db.DateTime
+  staffNo        Int?      @default(0, map: "DF__STOCK_REQ__STAFF__66760F55") @map("STAFFNO")
+  status         Int?      @default(0, map: "DF__STOCK_REQ__STATU__676A338E") @map("STATUS")
+  transType      Int?      @default(0, map: "DF__STOCK_REQ__TRANS__685E57C7") @map("TRANSTYPE")
+  custOrderNo    String?   @map("CUSTORDERNO") @db.NVarChar(20)
+  narrativeSeqNo Int?      @map("NARRATIVE_SEQNO")
+  origSeqNo      Int?      @default(-1, map: "DF__STOCK_REQ__ORIG___0B7E4229") @map("ORIG_SEQNO")
+
+  @@map("STOCK_REQUESTS")
+}
+
+model StockRequestlines {
+  seqNo           Int     @id(map: "PK__STOCK_REQUESTLIN__6A46A039") @default(autoincrement()) @map("SEQNO")
+  hdrSeqNo        Int     @default(0, map: "DF__STOCK_REQ__HDR_S__6B3AC472") @map("HDR_SEQNO")
+  stockCode       String  @map("STOCKCODE") @db.NVarChar(23)
+  description     String? @map("DESCRIPTION") @db.NVarChar(100)
+  packSize        Float?  @default(0, map: "DF__STOCK_REQ__PACK___6C2EE8AB") @map("PACK_SIZE")
+  reqQuant        Float?  @default(0, map: "DF__STOCK_REQ__REQ_Q__6D230CE4") @map("REQ_QUANT")
+  supQuant        Float?  @default(0, map: "DF__STOCK_REQ__SUP_Q__6F0B5556") @map("SUP_QUANT")
+  comment         String? @map("COMMENT") @db.NVarChar(30)
+  batchCode       String? @map("BATCHCODE") @db.NVarChar(20)
+  lineType        Int?    @default(-1, map: "DF__STOCK_REQ__LINET__273A9FE0") @map("LINETYPE")
+  linkedStockCode String? @map("LINKED_STOCKCODE") @db.NVarChar(23)
+  linkedQty       Float?  @default(1, map: "DF_STOCK_REQUESTLINES_LINKED_QTY") @map("LINKED_QTY")
+  bomType         String? @default("N", map: "DF__STOCK_REQ__BOMTY__282EC419") @map("BOMTYPE") @db.Char(1)
+  showLine        String? @default("Y", map: "DF__STOCK_REQ__SHOWL__2922E852") @map("SHOWLINE") @db.Char(1)
+  likedStatus     String? @default("N", map: "DF__STOCK_REQ__LINKE__2A170C8B") @map("LINKEDSTATUS") @db.Char(1)
+  bomPricing      String? @default("N", map: "DF__STOCK_REQ__BOMPR__2B0B30C4") @map("BOMPRICING") @db.Char(1)
+  narrrativeSeqNo Int?    @map("NARRATIVE_SEQNO")
+  lostQuant       Float?  @default(0, map: "DF__STOCK_REQ__LOST___19CC6180") @map("LOST_QUANT")
+  sentQuant       Float?  @default(0, map: "DF__STOCK_REQ__SENT___1AC085B9") @map("SENT_QUANT")
+  sendNow         Float?  @default(0, map: "DF__STOCK_REQ__SEND___1BB4A9F2") @map("SEND_NOW")
+  supNow          Float?  @default(0, map: "DF__STOCK_REQ__SUP_N__1CA8CE2B") @map("SUP_NOW")
+  soLineId        Int     @default(-1, map: "DF__STOCK_REQ__SOLIN__216D8348") @map("SOLINEID")
+
+  @@map("STOCK_REQUESTLINES")
+}

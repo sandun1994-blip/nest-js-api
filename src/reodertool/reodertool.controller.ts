@@ -13,4 +13,10 @@ export class ReodertoolController {
   sendOrder(@Body() body: BodyData) {
     return this.service.sendOrder(body);
   }
+
+  @UseGuards(AuthGuard)
+  @Post('sendtransfer')
+  sendTransfer(@Body() body: BodyData) {
+    return this.service.sendTransfer(body);
+  }
 }
