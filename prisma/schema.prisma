@@ -129,7 +129,7 @@ model StockRequirementTwo {
   centralLocation        Int?            @map("centralLocation")
   incommingty            Int?            @map("Incommingty")
   stockLocation          StockLocation   @relation(fields: [locNo], references: [locNo])
-  stockItem              StockItem       @relation(fields: [stockCode], references: [stockCode])
+  stockItem              StockItem ?      @relation(fields: [stockCode], references: [stockCode])
   supplierAccount        SupplierAccount @relation(fields: [accNo], references: [accNo])
 
   @@unique([stockCode, accNo, locNo])
@@ -153,6 +153,7 @@ model StockItem {
   sellPrice9          Float?                @default(0, map: "DF__STOCK_ITE__SELLP__3D690CCA") @map("SELLPRICE9")
   sellPrice10         Float?                @default(0, map: "DF__STOCK_ITE__SELLP__3E5D3103") @map("SELLPRICE10")
   latestCost          Float?                @default(0, map: "DF__STOCK_ITE__LATES__17AD7836") @map("LATESTCOST")
+  xLeadTimeRest       Float?                @default(0) @map("X_LEADTIME_REST")
   avgCost             Float?                @default(0, map: "DF__STOCK_ITE__AVECO__18A19C6F") @map("AVECOST")
   supplierNo          Int?                  @default(0, map: "DF__STOCK_ITE__SUPPL__25FB978D") @map("SUPPLIERNO")
   notes               String?               @map("NOTES") @db.NVarChar(Max)

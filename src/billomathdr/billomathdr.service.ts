@@ -28,6 +28,7 @@ export class BillomathdrService {
                     },
                   },
                 },
+                stockGroup: true,
               },
             },
           },
