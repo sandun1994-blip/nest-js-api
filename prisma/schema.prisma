@@ -129,7 +129,7 @@ model StockRequirementTwo {
   centralLocation        Int?            @map("centralLocation")
   incommingty            Int?            @map("Incommingty")
   stockLocation          StockLocation   @relation(fields: [locNo], references: [locNo])
-  stockItem              StockItem ?      @relation(fields: [stockCode], references: [stockCode])
+  stockItem              StockItem?      @relation(fields: [stockCode], references: [stockCode])
   supplierAccount        SupplierAccount @relation(fields: [accNo], references: [accNo])
 
   @@unique([stockCode, accNo, locNo])
@@ -307,6 +307,21 @@ model WorkOrder {
   billomatHdr          BillomatHdr? @relation(fields: [billCode], references: [billCode])
 
   @@map("WORKSORD_HDR")
+}
+
+model workorderLines {
+  seqNo                 Int     @id(map: "PK__WORKSORD___SEQNO__468862B0") @default(autoincrement()) @map("SEQNO")
+  hdrSeqNo              Int?    @default(0, map: "DF__WORKSORD___HDR_S__477C86E9") @map("HDR_SEQNO")
+  stockCode             String? @map("STOCKCODE") @db.NVarChar(23)
+  description           String? @map("DESCRIPTION") @db.NVarChar(100)
+  requiredQty           Float?  @default(0, map: "DF__WORKSORD___QTYRE__4870AB22") @map("QTYREQD")
+  usedQty               Float?  @default(0, map: "DF__WORKSORD___QTYUS__4964CF5B") @map("QTYUSED")
+  batchCode             String? @map("BATCHCODE") @db.NVarChar(20)
+  stockTransactionSeqNo Int?    @map("STOCKTRANS_SEQNO")
+
+  @@index([hdrSeqNo], map: "WORKSORD_LINES_HDR_SEQNO_IDX")
+  @@index([stockCode], map: "WORKSORD_LINES_STOCKCODE_IDX")
+  @@map("WORKSORD_LINES")
 }
 
 model SupplierStockItems {
@@ -647,4 +662,11 @@ model StockLocationsInfo {
 
   @@id([stockCode, location])
   @@map("STOCK_LOC_INFO")
+}
+
+model loopTable {
+  id    Int  @id() @default(autoincrement()) @map("SEQNO")
+  num Int @map("NUM")
+
+  @@map("LOOP_TABLE_TWO")
 }

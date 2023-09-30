@@ -15,9 +15,11 @@ import { PdfgenerateModule } from './pdfgenerate/pdfgenerate.module';
 import { MailsenderModule } from './mailsender/mailsender.module';
 import { BillomatlinesModule } from './billomatlines/billomatlines.module';
 import { BillomathdrModule } from './billomathdr/billomathdr.module';
+import { WorkorderModule } from './workorder/workorder.module';
+import { WorkorderlineModule } from './workorderline/workorderline.module';
 
 @Module({
-  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule, PurchaseorderlineModule, PdfgenerateModule, MailsenderModule, BillomatlinesModule, BillomathdrModule],
+  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule, PurchaseorderlineModule, PdfgenerateModule, MailsenderModule, BillomatlinesModule, BillomathdrModule, WorkorderModule, WorkorderlineModule],
   controllers: [AppController],
   providers: [AppService],
 })

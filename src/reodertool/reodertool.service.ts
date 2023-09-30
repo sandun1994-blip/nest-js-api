@@ -49,7 +49,7 @@ export class ReodertoolService {
       poLines: any[],
       name: string,
     ) => {
-      await new Promise((resolve) => setTimeout(resolve, 5000 * time));
+      await new Promise((resolve) => setTimeout(resolve, 7000 * time));
 
       return await this.sendMailAndData(time, supNumber, poLines, name);
     };
@@ -170,7 +170,6 @@ export class ReodertoolService {
       if (poOrderLines.length > 0) {
         await this.pdfgenerateService.createPdfSendOrder(poOrderLines);
         await this.purchaseOrder.updatePOTotalsByStoredProcedure(poOrder.seqNo);
-
         await this.stockrequirementService.refreshStocks(supNumber);
       }
 
@@ -229,7 +228,7 @@ export class ReodertoolService {
       fromTo: number | string,
       srLines: any[],
     ) => {
-      await new Promise((resolve) => setTimeout(resolve, 4000 * time));
+      await new Promise((resolve) => setTimeout(resolve, 5000 * time));
 
       return await this.sendTransferData(time, fromTo, srLines);
     };
