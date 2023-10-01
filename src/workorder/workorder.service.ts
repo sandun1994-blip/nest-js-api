@@ -6,15 +6,28 @@ export class WorkorderService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createWoAndLines(body: any) {
-    const sendData = async (data: any, time: number) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000 * time));
+    const sendData = async (data: any) => {
       return await this.processWoAndLines(data);
     };
-    console.log('worko');
 
-    const promises = body.data.map((data: any, i: any) => sendData(data, i));
+    const numberOfItems = body.data.length;
+    const woStatus = [];
 
-    return await Promise.allSettled(promises);
+    const callEachOrder = async (index: number) => {
+      console.log(numberOfItems, index);
+
+      if (numberOfItems < index + 1) {
+        return;
+      } else {
+        const promises = [body.data[index]].map((data) => sendData(data));
+        const result = await Promise.allSettled(promises);
+        woStatus.push(result[0]);
+
+        await callEachOrder(index + 1);
+      }
+    };
+    await callEachOrder(0);
+    return woStatus;
   }
 
   async processWoAndLines(dto: any) {
@@ -44,49 +57,6 @@ export class WorkorderService {
       console.log(error);
 
       throw new HttpException(error, 400);
-    }
-  }
-
-  async createTest(dto) {
-    console.log(dto);
-    const data = [];
-    for (let index = 0; index < 100; index++) {
-      data.push(index);
-    }
-
-    for (let index = 0; index < data.length; index++) {
-      const element = data[index];
-
-      await this.prismaService.loopTable.create({
-        data: { num: element },
-      });
-      const res = await this.prismaService.loopTable.findUnique({
-        where: { id: index },
-      });
-      console.log(res);
-      
-      if (res) {
-        await this.prismaService.loopTable.update({
-          data: { num: element * 2 },
-          where: { id: res.id },
-        });
-      }
-    }
-    for (let index = 0; index < data.length; index++) {
-      const element = data[index];
-
-      await this.prismaService.loopTable.create({
-        data: { num: element },
-      });
-      const res = await this.prismaService.loopTable.findUnique({
-        where: { id: index },
-      });
-      if (res) {
-        await this.prismaService.loopTable.update({
-          data: { num: element * 2 },
-          where: { id: res.id },
-        });
-      }
     }
   }
 }

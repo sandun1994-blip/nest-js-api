@@ -49,17 +49,34 @@ export class ReodertoolService {
       poLines: any[],
       name: string,
     ) => {
-      await new Promise((resolve) => setTimeout(resolve, 7000 * time));
-
+      // await new Promise((resolve) => setTimeout(resolve, 7000 * time));
       return await this.sendMailAndData(time, supNumber, poLines, name);
     };
+    // const promises = orderData.map((data, time: number) =>
+    //   sendData(time, data.supNumber, data.poLines, body?.user),
+    // );
+    // const result = await Promise.allSettled(promises);
+    const numberOfItems = orderData.length;
+    const orderStatus = [];
 
-    const promises = orderData.map((data, time: number) =>
-      sendData(time, data.supNumber, data.poLines, body?.user),
-    );
-    const result = await Promise.allSettled(promises);
+    const callEachOrder = async (index: number) => {
+      console.log(numberOfItems, index);
 
-    return result;
+      if (numberOfItems < index + 1) {
+        return;
+      } else {
+        const promises = [orderData[index]].map((data, time: number) =>
+          sendData(time, data.supNumber, data.poLines, body?.user),
+        );
+        const result = await Promise.allSettled(promises);
+        orderStatus.push(result);
+        console.log(result);
+
+        await callEachOrder(index + 1);
+      }
+    };
+    await callEachOrder(0);
+    return orderStatus;
   }
 
   async sendMailAndData(
@@ -93,78 +110,91 @@ export class ReodertoolService {
         await this.purchaseOrder.createByStoredProcedure(purchaseOrder);
 
       const poOrderLines = [];
-      for (let index = 0; index < poLines.length; index++) {
-        const element = poLines[index];
-        const purchaseOrderLine: any = {
-          seqNo: null,
-          purchaseOrder: {
-            seqNo: poOrder.seqNo,
-            supplierAccount: element.supplierAccount,
-          },
-          stockItem: element.stockItem,
-          status: 0,
-          branch: { branchNo: element.locationNumber },
-          location: element.locationNumber,
-          dueDate: getDate(new Date()),
-          unitPrice: element.stockItem.sellPrice1,
-          orderQty: element.calcReOrd,
-          orderNow: element.calcReOrd,
-          purchasePackQty: 0,
-          purchasePackPrice: 0,
-          sellPrice: element.stockItem.sellPrice1,
-          costQty: 0,
-          priceOverridden: 0,
-          linkedStockCode: element.stockItem.stockCode,
-        };
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        const poOrderLine =
-          await this.purchaseOrderLine.createByStoredProcedure(
-            purchaseOrderLine,
-          );
+      const createOrderLineByRecursion = async (index: number) => {
+        console.log(poLines.length, index);
 
-        const poReturnData = [poOrderLine].map((d) => {
-          return {
-            supplierAddress1: d.purchaseOrder.supplierAccount.address1,
-            supplierAddress2: d.purchaseOrder.supplierAccount.address2,
-            supplierAddress3: d.purchaseOrder.supplierAccount.address3,
-            stockLocationName: element.locationName,
-            stockLocationAddress1: element.locationAddress1,
-            stockLocationAddress2: element.locationAddress2,
-            stockLocationAddress3: element.locationAddress3,
-            stockLocationAddress4: element.locationAddress4,
-            purchaseOrder: d.purchaseOrder.seqNo,
-            calcReOrd: d.orderQty,
-            email: d.purchaseOrder.supplierAccount.email,
-            fax: d.purchaseOrder.supplierAccount.fax,
-            phone: d.purchaseOrder.supplierAccount.phone,
-            orderDate: getDate(d.purchaseOrder.orderDate),
-            dispatchDate: getDate(d.purchaseOrder.dueDate),
-            supplierCode: element.supplierCode,
-            ourCode: d.stockItem.stockCode,
-            unit: 'EACH',
-            unitPriceExGst: d.unitPrice,
-            notes: d.purchaseOrder.deleveryNotes,
-            description: d.stockItem.description,
-            lineTotal: (
-              parseFloat(d.unitPrice) * parseFloat(d.orderQty)
-            ).toFixed(2),
-            name: d.purchaseOrder.supplierAccount.name,
-            defLocationNo: d.purchaseOrder.defLocationNo,
-            subTotal: (
-              parseFloat(d.unitPrice) * parseFloat(d.orderQty)
-            ).toFixed(2),
-            narrativeText: d.narratives
-              ? d.narratives.narrative.substring(0, 350)
-              : d.stockItem.description.substring(0, 350),
-            loggedInUser: userName,
-            statusDesc: element.supplierAccount.creditStatuses.statusDesc,
-            currencyNo:
-              d.purchaseOrder.supplierAccount.currencyNo === 0 ? 'AU$' : 'US$',
+        if (poLines.length - 1 < index) {
+          return;
+        } else {
+          const element = poLines[index];
+          const purchaseOrderLine: any = {
+            seqNo: null,
+            purchaseOrder: {
+              seqNo: poOrder.seqNo,
+              supplierAccount: element.supplierAccount,
+            },
+            stockItem: element.stockItem,
+            status: 0,
+            branch: { branchNo: element.locationNumber },
+            location: element.locationNumber,
+            dueDate: getDate(new Date()),
+            unitPrice: element.stockItem.sellPrice1,
+            orderQty: element.calcReOrd,
+            orderNow: element.calcReOrd,
+            purchasePackQty: 0,
+            purchasePackPrice: 0,
+            sellPrice: element.stockItem.sellPrice1,
+            costQty: 0,
+            priceOverridden: 0,
+            linkedStockCode: element.stockItem.stockCode,
           };
-        });
-        poOrderLines.push(poReturnData[0]);
-      }
 
+          const poOrderLine =
+            await this.purchaseOrderLine.createByStoredProcedure(
+              purchaseOrderLine,
+            );
+
+          const poReturnData = [poOrderLine].map((d) => {
+            return {
+              supplierAddress1: d.purchaseOrder.supplierAccount.address1,
+              supplierAddress2: d.purchaseOrder.supplierAccount.address2,
+              supplierAddress3: d.purchaseOrder.supplierAccount.address3,
+              stockLocationName: element.locationName,
+              stockLocationAddress1: element.locationAddress1,
+              stockLocationAddress2: element.locationAddress2,
+              stockLocationAddress3: element.locationAddress3,
+              stockLocationAddress4: element.locationAddress4,
+              purchaseOrder: d.purchaseOrder.seqNo,
+              calcReOrd: d.orderQty,
+              email: d.purchaseOrder.supplierAccount.email,
+              fax: d.purchaseOrder.supplierAccount.fax,
+              phone: d.purchaseOrder.supplierAccount.phone,
+              orderDate: getDate(d.purchaseOrder.orderDate),
+              dispatchDate: getDate(d.purchaseOrder.dueDate),
+              supplierCode: element.supplierCode,
+              ourCode: d.stockItem.stockCode,
+              unit: 'EACH',
+              unitPriceExGst: d.unitPrice,
+              notes: d.purchaseOrder.deleveryNotes,
+              description: d.stockItem.description,
+              lineTotal: (
+                parseFloat(d.unitPrice) * parseFloat(d.orderQty)
+              ).toFixed(2),
+              name: d.purchaseOrder.supplierAccount.name,
+              defLocationNo: d.purchaseOrder.defLocationNo,
+              subTotal: (
+                parseFloat(d.unitPrice) * parseFloat(d.orderQty)
+              ).toFixed(2),
+              narrativeText: d.narratives
+                ? d.narratives.narrative.substring(0, 350)
+                : d.stockItem.description.substring(0, 350),
+              loggedInUser: userName,
+              statusDesc: element.supplierAccount.creditStatuses.statusDesc,
+              currencyNo:
+                d.purchaseOrder.supplierAccount.currencyNo === 0
+                  ? 'AU$'
+                  : 'US$',
+            };
+          });
+          poOrderLines.push(poReturnData[0]);
+
+          await createOrderLineByRecursion(index + 1);
+        }
+      };
+      await createOrderLineByRecursion(0);
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // console.log(poOrderLines);
 
       if (poOrderLines.length > 0) {
@@ -228,17 +258,31 @@ export class ReodertoolService {
       fromTo: number | string,
       srLines: any[],
     ) => {
-      await new Promise((resolve) => setTimeout(resolve, 5000 * time));
-
       return await this.sendTransferData(time, fromTo, srLines);
     };
 
-    const promises = orderData.map((data, time: number) =>
-      sendTransfer(time, data.fromTo, data.srLines),
-    );
-    const result = await Promise.allSettled(promises);
+    ///////////////////////////////////////////////////////////////////////////////////////
+    const numberOfItems = orderData.length;
+    const transferStatus = [];
 
-    return result;
+    const callEachOrder = async (index: number) => {
+      console.log(numberOfItems, index);
+
+      if (numberOfItems - 1 < index) {
+        return;
+      } else {
+        const promises = [orderData[index]].map((data, time: number) =>
+          sendTransfer(time, data.fromTo, data.srLines),
+        );
+        const result = await Promise.allSettled(promises);
+        transferStatus.push(result[0]);
+
+        await callEachOrder(index + 1);
+      }
+    };
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    await callEachOrder(0);
+    return transferStatus;
   }
 
   /////////////////////////
@@ -266,67 +310,87 @@ export class ReodertoolService {
         data: stockRequest,
       });
 
-      const sendData = (srp: any, line: any, time: number) => {
-        setTimeout(async () => {
-          const response = await this.prismaService.$transaction(
-            async (tx) => {
-              // Code running in a transaction...
-              return await tx.narratives.create({
-                data: { narrative: line?.stockItem?.notes },
-              });
-            },
-            {
-              maxWait: 5000, // default: 2000
-              timeout: 10000, // default: 5000
-              isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
-            },
-          );
+      const sendData = async (srp: any, line: any) => {
+        const response = await this.prismaService.$transaction(
+          async (tx) => {
+            // Code running in a transaction...
+            return await tx.narratives.create({
+              data: { narrative: line?.stockItem?.notes },
+            });
+          },
+          {
+            maxWait: 5000, // default: 2000
+            timeout: 10000, // default: 5000
+            isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+          },
+        );
 
-          const stockRequestLine = {
-            hdrSeqNo: srp.seqNo,
-            stockCode: line.stockCode,
-            description: line.description,
-            packSize: 1,
-            reqQuant: parseInt(line.calcReOrd),
-            supQuant: 0,
-            comment: null,
-            batchCode: null,
-            lineType: 0,
-            linkedStockCode: line.stockCode,
-            linkedQty: 1,
-            bomType: 'N',
-            showLine: 'Y',
-            likedStatus: 'S',
-            bomPricing: 'N',
-            narrrativeSeqNo: response.seqNo,
-            lostQuant: 0,
-            sentQuant: 0,
-            sendNow: 0,
-            supNow: 0,
-            soLineId: -1,
-          };
-          await this.prismaService.$transaction(
-            async (tx) => {
-              // Code running in a transaction...
-              return await tx.stockRequestlines.create({
-                data: stockRequestLine,
-              });
-            },
-            {
-              maxWait: 5000, // default: 2000
-              timeout: 10000, // default: 5000
-              isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
-            },
-          );
-        }, 1000 * time);
+        const stockRequestLine = {
+          hdrSeqNo: srp.seqNo,
+          stockCode: line.stockCode,
+          description: line.description,
+          packSize: 1,
+          reqQuant: parseInt(line.calcReOrd),
+          supQuant: 0,
+          comment: null,
+          batchCode: null,
+          lineType: 0,
+          linkedStockCode: line.stockCode,
+          linkedQty: 1,
+          bomType: 'N',
+          showLine: 'Y',
+          likedStatus: 'S',
+          bomPricing: 'N',
+          narrrativeSeqNo: response.seqNo,
+          lostQuant: 0,
+          sentQuant: 0,
+          sendNow: 0,
+          supNow: 0,
+          soLineId: -1,
+        };
+        await this.prismaService.$transaction(
+          async (tx) => {
+            // Code running in a transaction...
+            return await tx.stockRequestlines.create({
+              data: stockRequestLine,
+            });
+          },
+          {
+            maxWait: 5000, // default: 2000
+            timeout: 10000, // default: 5000
+            isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+          },
+        );
       };
 
-      for (let index = 0; index < srLines.length; index++) {
-        sendData(srResponse, srLines[index], index);
-      }
+      const createTransferLineByRecursion = async (index: number) => {
+        console.log(index);
+
+        if (srLines.length - 1 < index) {
+          return;
+        } else {
+          await sendData(srResponse, srLines[index]);
+          await createTransferLineByRecursion(index + 1);
+        }
+      };
+
+      await createTransferLineByRecursion(0);
+
       return srResponse;
     } catch (error) {
       console.log(error);
     }
+  }
+
+  /////////inset pause items //////////////////
+
+  async insertPauseItems(dto: any) {
+    return await this.prismaService.reorderPauseItems.create({ data: dto });
+  }
+
+  async getALLPauseItems() {
+    await this.prismaService
+      .$queryRaw`DELETE FROM REORDER_TOOL_REMOVE_ITEM_TEMPORARILY WHERE  getdate() >= DATEADD(day, hiddenDay, insertDate)`;
+    return await this.prismaService.reorderPauseItems.findMany();
   }
 }

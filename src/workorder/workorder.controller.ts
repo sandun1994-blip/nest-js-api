@@ -11,10 +11,4 @@ export class WorkorderController {
   sendOrder(@Body() body: any) {
     return this.workorderService.createWoAndLines(body);
   }
-
-  @Post('test')
-  createTest(@Body() body: any) {
-    return this.workorderService.createTest(body);
-  }
-
 }

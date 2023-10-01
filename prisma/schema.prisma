@@ -670,3 +670,17 @@ model loopTable {
 
   @@map("LOOP_TABLE_TWO")
 }
+
+
+model reorderPauseItems {
+  id          Int       @id(map: "PK__REORDER___3213E83F2BDA5CC7") @default(autoincrement())
+  stockCode   String    @db.NChar(23)
+  locNo       Int
+  accNo       Int
+  combineCode String    @db.NChar(50)
+  insertDate  DateTime
+  hiddenDay   Int
+  insertBy    String?   @db.NChar(50)
+
+  @@map("REORDER_TOOL_REMOVE_ITEM_TEMPORARILY")
+}
