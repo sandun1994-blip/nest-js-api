@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderData } from './dtos/pdfgenerate.dto';
 import { createWriteStream } from 'fs';
 import { getFormatedDate } from 'src/reodertool/lib/lib';
 import { MailsenderService } from 'src/mailsender/mailsender.service';
 import { Prisma } from '@prisma/client';
+import { error } from 'console';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFDocument = require('pdfkit-table');
@@ -348,6 +349,7 @@ export class PdfgenerateService {
             });
           } catch (error) {
             console.log(error);
+            throw new HttpException(error, 400);
           }
         },
         {

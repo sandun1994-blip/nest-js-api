@@ -19,7 +19,24 @@ import { WorkorderModule } from './workorder/workorder.module';
 import { WorkorderlineModule } from './workorderline/workorderline.module';
 
 @Module({
-  imports:[ConfigModule.forRoot(), UserModule, PrismaModule, HomeModule, StockrequirementModule, SupplierstockitemsModule, SupplieraccountModule, ReodertoolModule, PurchaseorderModule, PurchaseorderlineModule, PdfgenerateModule, MailsenderModule, BillomatlinesModule, BillomathdrModule, WorkorderModule, WorkorderlineModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    UserModule,
+    PrismaModule,
+    HomeModule,
+    StockrequirementModule,
+    SupplierstockitemsModule,
+    SupplieraccountModule,
+    ReodertoolModule,
+    PurchaseorderModule,
+    PurchaseorderlineModule,
+    PdfgenerateModule,
+    MailsenderModule,
+    BillomatlinesModule,
+    BillomathdrModule,
+    WorkorderModule,
+    WorkorderlineModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

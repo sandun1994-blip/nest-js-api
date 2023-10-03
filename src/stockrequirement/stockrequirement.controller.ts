@@ -22,7 +22,7 @@ export class StockrequirementController {
   @UseGuards(AuthGuard)
   @Get('stktwo/:stockcode')
   getSTKTwo(@Param('stockcode') stockcode: string) {
-    
     return this.stockrequirementService.getSTKByStockcode(stockcode);
   }
+  
 }

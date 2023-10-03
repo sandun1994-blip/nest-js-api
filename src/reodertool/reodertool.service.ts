@@ -69,7 +69,7 @@ export class ReodertoolService {
           sendData(time, data.supNumber, data.poLines, body?.user),
         );
         const result = await Promise.allSettled(promises);
-        orderStatus.push(result);
+        orderStatus.push(result[0]);
         console.log(result);
 
         await callEachOrder(index + 1);
@@ -392,5 +392,11 @@ export class ReodertoolService {
     await this.prismaService
       .$queryRaw`DELETE FROM REORDER_TOOL_REMOVE_ITEM_TEMPORARILY WHERE  getdate() >= DATEADD(day, hiddenDay, insertDate)`;
     return await this.prismaService.reorderPauseItems.findMany();
+  }
+
+  async deleteItemById(id: number) {
+    return await this.prismaService.reorderPauseItems.delete({
+      where: { id },
+    });
   }
 }

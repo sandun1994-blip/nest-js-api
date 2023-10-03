@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { ReodertoolService } from './reodertool.service';
 import { SendataDto } from './dtos/reordertool.dto';
@@ -30,5 +38,11 @@ export class ReodertoolController {
   @Get('getpauseitem')
   public async getALLPauseItems(): Promise<any> {
     return this.service.getALLPauseItems();
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('pauseitem/:id')
+  public async deleteItemById(@Param('id') id: number): Promise<any> { 
+    return this.service.deleteItemById(id);
   }
 }
