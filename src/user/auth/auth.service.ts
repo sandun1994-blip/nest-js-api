@@ -3,25 +3,34 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 
-const EXPIRE_TIME = 60 * 60000 * 24;
+const EXPIRE_TIME = 20 * 60000 * 24;
 interface SignupParams {
   email: string;
   password: string;
-  name: string;
-  phone: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  age: number;
 }
 
 interface SigninParams {
-  email: string;
+  username: string;
   password: string;
 }
 
 @Injectable()
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
-  async signup({ email, password, name, phone }: SignupParams) {
+  async signup({
+    email,
+    password,
+    firstName,
+    lastName,
+    username,
+    age,
+  }: SignupParams) {
     const userExistes = await this.prismaService.user.findUnique({
-      where: { email },
+      where: { username },
     });
     // console.log(userExistes);
 
@@ -34,19 +43,27 @@ export class AuthService {
     const user = await this.prismaService.user.create({
       data: {
         email,
-        name,
-        phone,
+        firstName,
+        lastName,
         password: hashedPassword,
-        user_type: 'USER',
+        age,
+        username,
       },
     });
 
-    return this.generateJWT(user.name, user.id);
+    return this.generateJWT(user.username, user.id);
   }
 
-  async signin({ email, password }: SigninParams) {
+  async signin({ username, password }: SigninParams) {
     const user = await this.prismaService.user.findUnique({
-      where: { email },
+      where: { username },
+      include: {
+        UserSystemMenuItem: {
+          include: {
+            SystemMenuItem: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -61,10 +78,10 @@ export class AuthService {
     }
 
     return {
-      user,
+      user: { ...user, password: null },
       backendTokens: {
-        accessToken: await this.generateJWT(user.name, user.id),
-        refreshToken: await this.generateRefreshJWT(user.name, user.id),
+        accessToken: await this.generateJWT(user.username, user.id),
+        refreshToken: await this.generateRefreshJWT(user.username, user.id),
         expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
       },
     };
@@ -83,8 +100,6 @@ export class AuthService {
   }
 
   async refreshToken(user: any) {
-    console.log(user);
-
     return {
       accessToken: await this.generateJWT(user.name, user.id),
       refreshToken: await this.generateRefreshJWT(user.name, user.id),

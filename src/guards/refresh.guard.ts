@@ -19,14 +19,12 @@ export class RefreshGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    
+
     const token = request.headers?.authorization?.split('Refresh ')[1];
-   
-    
+
     try {
       const user = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
       request['user'] = user;
-     
 
       return true;
     } catch (error) {

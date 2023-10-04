@@ -6,8 +6,8 @@ export class WorkorderService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createWoAndLines(body: any) {
-    const sendData = async (data: any) => {
-      return await this.processWoAndLines(data);
+    const sendData = async (data: any, user: any) => {
+      return await this.processWoAndLines(data, user);
     };
 
     const numberOfItems = body.data.length;
@@ -19,7 +19,9 @@ export class WorkorderService {
       if (numberOfItems < index + 1) {
         return;
       } else {
-        const promises = [body.data[index]].map((data) => sendData(data));
+        const promises = [body.data[index]].map((data) =>
+          sendData(data, body.user),
+        );
         const result = await Promise.allSettled(promises);
         woStatus.push(result[0]);
 
@@ -30,10 +32,10 @@ export class WorkorderService {
     return woStatus;
   }
 
-  async processWoAndLines(dto: any) {
+  async processWoAndLines(dto: any, user: any) {
     try {
       const response: any = await this.prismaService
-        .$queryRaw`DECLARE @OUT_SEQNO int;EXEC @OUT_SEQNO=CREATE_WO_HEADER @TRANSDATE=${dto.transDate} ,@SALESNO=${dto.salesNo} ,@BILLCODE=${dto.billCode} , @PRODQTY=${dto.prodQty}, @PRODLOCNO=${dto.prodLocNo},@HDR_SEQNO=@OUT_SEQNO OUTPUT;SELECT @OUT_SEQNO;`;
+        .$queryRaw`DECLARE @OUT_SEQNO int;EXEC @OUT_SEQNO=CREATE_WO_HEADER @TRANSDATE=${dto.transDate} ,@SALESNO=${user.staffNo} ,@BILLCODE=${dto.billCode} , @PRODQTY=${dto.prodQty}, @PRODLOCNO=${dto.prodLocNo},@HDR_SEQNO=@OUT_SEQNO OUTPUT;SELECT @OUT_SEQNO;`;
 
       const seqNo = response[0][''];
 

@@ -10,15 +10,65 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model User {
+//   id         Int      @id @default(autoincrement())
+//   name       String
+//   phone      String
+//   email      String   @unique
+//   password   String
+//   created_at DateTime @default(now())
+//   updated_at DateTime @updatedAt
+//   user_type  String
+// }
+
 model User {
-  id         Int      @id @default(autoincrement())
-  name       String
-  phone      String
-  email      String   @unique
-  password   String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  user_type  String
+  id                 Int                  @id(map: "PK__SECURITY__3213E83FE2606B62") @default(autoincrement())
+  firstName          String?              @db.VarChar(50)
+  lastName           String?              @db.VarChar(50)
+  username           String               @unique() @db.VarChar(50)
+  password           String?              @db.VarChar(550)
+  age                Int?
+  email              String?              @unique() @db.VarChar(50)
+  isActive           Int?
+  staffNo            Int?
+  UserSystemMenuItem UserSystemMenuItem[]
+
+  @@map("SECURITYUSER")
+}
+
+model UserSystemMenuItem {
+  id                Int              @id() @default(autoincrement())
+  user_id           Int
+  systemmenuitem_id Int              @unique()
+  createdDate       DateTime?        @db.DateTime
+  createdBy         String           @db.VarChar(50)
+  isActive          Int?
+  lastUpdatedDate   DateTime?        @db.DateTime
+  lastUpdatedBy     String           @db.VarChar(50)
+  user              User             @relation(fields: [user_id], references: [id])
+  SystemMenuItem    SystemMenuItem[]
+
+  @@map("USER_SYSTEMMENUITEM")
+}
+
+model SystemMenuItem {
+  id                 Int                @id() @default(autoincrement())
+  name               String?            @db.VarChar(50)
+  description        String?            @db.VarChar(255)
+  link               String             @db.VarChar(255)
+  createdDate        DateTime?          @db.DateTime
+  createdBy          String             @db.VarChar(50)
+  isActive           Int?
+  lastUpdatedDate    DateTime?          @db.DateTime
+  lastUpdatedBy      String             @db.VarChar(50)
+  comments           String?            @db.VarChar(255)
+  subtitle           String?            @db.VarChar(255)
+  icon               String?            @db.VarChar(50)
+  color              String?            @db.VarChar(50)
+  sortOrder          Int?
+  userSystemMenuItem UserSystemMenuItem @relation(fields: [id], references: [systemmenuitem_id])
+
+  @@map("SYSTEMMENUITEM")
 }
 
 model Home {
@@ -665,22 +715,21 @@ model StockLocationsInfo {
 }
 
 model loopTable {
-  id    Int  @id() @default(autoincrement()) @map("SEQNO")
+  id  Int @id() @default(autoincrement()) @map("SEQNO")
   num Int @map("NUM")
 
   @@map("LOOP_TABLE_TWO")
 }
 
-
 model reorderPauseItems {
-  id          Int       @id(map: "PK__REORDER___3213E83F2BDA5CC7") @default(autoincrement())
-  stockCode   String    @db.NChar(23)
+  id          Int      @id(map: "PK__REORDER___3213E83F2BDA5CC7") @default(autoincrement())
+  stockCode   String   @db.NChar(23)
   locNo       Int
   accNo       Int
-  combineCode String    @db.NChar(50)
+  combineCode String   @db.NChar(50)
   insertDate  DateTime
   hiddenDay   Int
-  insertBy    String?   @db.NChar(50)
+  insertBy    String?  @db.NChar(50)
 
   @@map("REORDER_TOOL_REMOVE_ITEM_TEMPORARILY")
 }
