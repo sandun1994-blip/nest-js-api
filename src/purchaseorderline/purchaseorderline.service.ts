@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -37,6 +37,7 @@ export class PurchaseorderlineService {
           });
         } catch (error) {
           console.log(error);
+          throw new HttpException(error, 400);
         }
       },
       {

@@ -7,10 +7,10 @@ import { RefreshGuard } from 'src/guards/refresh.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('/signup')
-  signup(@Body() body: SignupDto) {
-    return this.authService.signup(body);
-  }
+  // @Post('/signup')
+  // signup(@Body() body: SignupDto) {
+  //   return this.authService.signup(body);
+  // }
 
   @Post('/signin')
   signin(@Body() body: SigninDto) {

@@ -5,7 +5,6 @@ import { createWriteStream } from 'fs';
 import { getFormatedDate } from 'src/reodertool/lib/lib';
 import { MailsenderService } from 'src/mailsender/mailsender.service';
 import { Prisma } from '@prisma/client';
-import { error } from 'console';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFDocument = require('pdfkit-table');
@@ -57,11 +56,7 @@ export class PdfgenerateService {
       size: 'A4',
     });
 
-    // pdf.image(`${process.env.LOGO_PATH}`, 25, 12, { scale: 0.5 });
-    // pdf.image("../../document/DynamicsGex_Header.png", 75, 12, {
-    //   fit: [120, 350],
-
-    // });
+    pdf.image(`document/DynamicsGex_Header.png`, 25, 12, { scale: 0.5 });
 
     // customize your PDF document
     pdf
@@ -367,6 +362,7 @@ export class PdfgenerateService {
       })
       .catch((err) => {
         console.log(err);
+        throw new HttpException(err, 400);
       });
   }
 }

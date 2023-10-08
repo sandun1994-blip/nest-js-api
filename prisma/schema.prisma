@@ -274,7 +274,7 @@ model SupplierAccount {
   stockRequirement    StockRequirement[]
   SupplierStockItems  SupplierStockItems[]
   PurchaseOrder       PurchaseOrder[]
-  StockRequirementTwo StockRequirementTwo[]
+  StockRequirementTwo StockRequirementTwo[] 
 
   @@map("CR_ACCS")
 }

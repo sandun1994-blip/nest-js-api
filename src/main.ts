@@ -20,8 +20,8 @@ async function bootstrap() {
   app.enableCors();
   const configService = app.get(ConfigService);
   const port = configService.get<number>('APP_PORT');
-  console.log(port);
- // app.enableShutdownHooks();
+
+  // app.enableShutdownHooks();
   await app.listen(port);
 }
 bootstrap();

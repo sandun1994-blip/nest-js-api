@@ -10,12 +10,11 @@ export class WorkorderService {
       return await this.processWoAndLines(data, user);
     };
 
+
     const numberOfItems = body.data.length;
     const woStatus = [];
 
     const callEachOrder = async (index: number) => {
-      console.log(numberOfItems, index);
-
       if (numberOfItems < index + 1) {
         return;
       } else {

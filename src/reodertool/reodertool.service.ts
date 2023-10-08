@@ -60,9 +60,8 @@ export class ReodertoolService {
     const orderStatus = [];
 
     const callEachOrder = async (index: number) => {
-      console.log(numberOfItems, index);
-
       if (numberOfItems < index + 1) {
+        //console.log(numberOfItems, index);
         return;
       } else {
         const promises = [orderData[index]].map((data, time: number) =>
@@ -70,7 +69,7 @@ export class ReodertoolService {
         );
         const result = await Promise.allSettled(promises);
         orderStatus.push(result[0]);
-        console.log(result);
+        // console.log(result);
 
         await callEachOrder(index + 1);
       }
@@ -113,7 +112,7 @@ export class ReodertoolService {
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       const createOrderLineByRecursion = async (index: number) => {
-        console.log(poLines.length, index);
+        //console.log(poLines.length, index);
 
         if (poLines.length - 1 < index) {
           return;
@@ -266,7 +265,7 @@ export class ReodertoolService {
     const transferStatus = [];
 
     const callEachOrder = async (index: number) => {
-      console.log(numberOfItems, index);
+      // console.log(numberOfItems, index);
 
       if (numberOfItems - 1 < index) {
         return;
@@ -364,7 +363,7 @@ export class ReodertoolService {
       };
 
       const createTransferLineByRecursion = async (index: number) => {
-        console.log(index);
+        // console.log(index);
 
         if (srLines.length - 1 < index) {
           return;

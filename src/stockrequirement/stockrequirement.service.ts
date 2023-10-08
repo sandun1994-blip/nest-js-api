@@ -8,6 +8,11 @@ export class StockrequirementService {
   async getStockrequirement(): Promise<any[]> {
     try {
       const stk = await this.prismaService.stockRequirement.findMany({
+        where: {
+          stockLocation: {
+            locNo: { notIn: [15, 17, 18, 19, 20, 8, 9, 11] },
+          },
+        },
         include: {
           stockItem: {
             include: {
