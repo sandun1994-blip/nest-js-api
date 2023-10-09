@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Put, Query, UseGuards } from '@nestjs/common';
 import { StockrequirementService } from './stockrequirement.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 
@@ -24,5 +24,10 @@ export class StockrequirementController {
   getSTKTwo(@Param('stockcode') stockcode: string) {
     return this.stockrequirementService.getSTKByStockcode(stockcode);
   }
-  
+
+  @UseGuards(AuthGuard)
+  @Put('refresh/:supnum')
+  refreshStocks(@Param('supnum') supnum: number) {
+    return this.stockrequirementService.refreshStocks(supnum);
+  }
 }

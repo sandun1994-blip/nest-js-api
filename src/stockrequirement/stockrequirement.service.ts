@@ -50,6 +50,7 @@ export class StockrequirementService {
       return stk.map((item) => item);
     } catch (error) {
       console.log(error);
+      return error;
     }
   }
 
@@ -71,10 +72,12 @@ export class StockrequirementService {
   }
 
   async refreshStocks(supplierNo: number) {
-    await this.prismaService.$transaction(
+    return await this.prismaService.$transaction(
       async (tx) => {
         // Code running in a transaction...
+
         await tx.$queryRaw`EXEC CALC_STKREQUIREMENT @SUPPLIERNO =${supplierNo}`;
+        return { status: 'ok' };
       },
       {
         maxWait: 5000, // default: 2000
